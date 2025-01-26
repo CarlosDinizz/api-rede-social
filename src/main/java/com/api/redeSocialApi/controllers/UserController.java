@@ -1,15 +1,12 @@
 package com.api.redeSocialApi.controllers;
 
 import com.api.redeSocialApi.dtos.UserDTO;
-import com.api.redeSocialApi.domain.User;
-import com.api.redeSocialApi.repositories.UserRepository;
-import com.api.redeSocialApi.ResponseId;
+import com.api.redeSocialApi.repositories.ResponseId;
 import com.api.redeSocialApi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController

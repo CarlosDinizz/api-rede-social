@@ -1,4 +1,4 @@
-package com.api.redeSocialApi;
+package com.api.redeSocialApi.repositories;
 
 import java.util.UUID;
 
