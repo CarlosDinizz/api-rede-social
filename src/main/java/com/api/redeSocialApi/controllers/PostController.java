@@ -1,6 +1,6 @@
 package com.api.redeSocialApi.controllers;
 
-import com.api.redeSocialApi.repositories.ResponseId;
+import com.api.redeSocialApi.dtos.ResponseId;
 import com.api.redeSocialApi.dtos.PostDTO;
 import com.api.redeSocialApi.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;

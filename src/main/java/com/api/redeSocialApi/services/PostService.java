@@ -1,6 +1,6 @@
 package com.api.redeSocialApi.services;
 
-import com.api.redeSocialApi.repositories.ResponseId;
+import com.api.redeSocialApi.dtos.ResponseId;
 import com.api.redeSocialApi.domain.Post;
 import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.dtos.PostDTO;

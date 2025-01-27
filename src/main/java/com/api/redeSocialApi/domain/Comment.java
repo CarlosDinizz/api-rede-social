@@ -1,8 +1,7 @@
 package com.api.redeSocialApi.domain;
 
-import com.api.redeSocialApi.dtos.PostDTO;
+import com.api.redeSocialApi.dtos.CommentDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,51 +9,44 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "post")
+@Table(name = "comment")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "url_image")
-    private String urlImg;
-
     @Column(name = "description")
     private String description;
 
-    @Column(name = "likes", nullable = false)
+    @Column(name = "likes")
     private Integer likes;
 
-    @Column(name = "time_recorded", nullable = false)
+    @Column(name = "time_recorded")
     private LocalDateTime time;
 
-    @Column(name = "is_comments_blocked", nullable = false)
-    private Boolean isCommentsBlocked;
-
-    @JoinColumn(name = "user_id")
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "post_id")
     @JsonIgnore
+    private Post post;
+
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments;
-
-    public Post(PostDTO postDTO, User user){
-        urlImg = postDTO.getUrlImg();
-        description = postDTO.getDescription();
+    public Comment(CommentDTO commentDTO, User user, Post post){
+        description = commentDTO.getDescription();
         likes = 0;
         time = LocalDateTime.now();
-        isCommentsBlocked = postDTO.getIsCommentsBlocked();
+        this.post = post;
         this.user = user;
     }
 }

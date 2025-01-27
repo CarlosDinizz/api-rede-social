@@ -1,7 +1,7 @@
 package com.api.redeSocialApi.controllers;
 
 import com.api.redeSocialApi.dtos.UserDTO;
-import com.api.redeSocialApi.repositories.ResponseId;
+import com.api.redeSocialApi.dtos.ResponseId;
 import com.api.redeSocialApi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

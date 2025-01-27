@@ -1,4 +1,4 @@
-package com.api.redeSocialApi.repositories;
+package com.api.redeSocialApi.dtos;
 
 import java.util.UUID;
 
