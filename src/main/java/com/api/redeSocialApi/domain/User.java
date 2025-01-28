@@ -42,6 +42,10 @@ public class User {
     @JsonIgnore
     private List<Post> posts;
 
+    @OneToOne(mappedBy = "userAssociated", cascade = CascadeType.ALL)
+    private Followers follower;
+
+
     public User(UserDTO userDTO){
         this.name = userDTO.getName();
         this.email = userDTO.getEmail();
@@ -49,11 +53,4 @@ public class User {
         isActivated = true;
     }
 
-    public void addPost(Post post){
-        if (posts == null){
-            posts = new ArrayList<>();
-            posts.add(post);
-        }
-        posts.add(post);
-    }
 }

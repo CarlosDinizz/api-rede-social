@@ -1,5 +1,6 @@
 package com.api.redeSocialApi.dtos;
 
+import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class UserDTO {
     private String email;
     private String password;
     private Boolean is_activated;
+    private Followers followers;
 
     public UserDTO(User user){
         id = user.getId();
@@ -26,5 +28,6 @@ public class UserDTO {
         email = user.getEmail();
         password = user.getPassword();
         is_activated = user.getIsActivated();
+        followers = user.getFollower();
     }
 }

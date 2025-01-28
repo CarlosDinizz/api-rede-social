@@ -3,7 +3,8 @@ CREATE TABLE users(
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    is_activated BOOLEAN NOT NULL
+    is_activated BOOLEAN NOT NULL,
+    followers_id UUID
 );
 
 CREATE TABLE post(
@@ -28,4 +29,23 @@ CREATE TABLE comment(
 
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (post_id) REFERENCES post(id)
+);
+
+CREATE TABLE followers(
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    user_id UUID NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+ALTER TABLE users
+ADD FOREIGN KEY (followers_id) REFERENCES followers(id);
+
+CREATE TABLE followers_users(
+    user_id UUID,
+    followers_id UUID,
+
+    PRIMARY KEY(user_id, followers_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (followers_id) REFERENCES followers(id)
 );
