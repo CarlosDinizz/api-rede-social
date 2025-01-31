@@ -1,8 +1,10 @@
 package com.api.redeSocialApi.services;
 
 import com.api.redeSocialApi.domain.Followers;
+import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.repositories.FollowersRepository;
+import com.api.redeSocialApi.repositories.FollowingRepository;
 import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,41 +16,48 @@ public class FollowerService {
 
     private FollowersRepository repository;
     private UserRepository userRepository;
+    private FollowingRepository followingRepository;
 
     @Autowired
-    public FollowerService(FollowersRepository repository, UserRepository userRepository){
+    public FollowerService(FollowersRepository repository, UserRepository userRepository, FollowingRepository followingRepository){
         this.repository = repository;
         this.userRepository = userRepository;
+        this.followingRepository = followingRepository;
     }
 
     public void addFollower(UUID userId, UUID followerId){
-        Followers followers = repository.findFollowersByUserAssociatedId(userId);
         User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (followers != null){
-            followers.getFollowers().add(follower);
-            followers.setQuantity(followers.getQuantity() + 1);
-            repository.save(followers);
-            return;
-        }
-
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Followers newFollower = new Followers(user, follower);
-        repository.save(newFollower);
-    }
+        Followers followers = repository.findByUserId(userId);
 
-    public void removeFollower(UUID userId, UUID followerId){
-        Followers followers = repository.findFollowersByUserAssociatedId(userId);
 
-        if (followers.getQuantity() == 0){
-            throw new RuntimeException("No followers");
+        Following following = followingRepository.findByUserId(followerId);
+
+        if (following.getFollowing().contains(user)){
+            throw new RuntimeException("The user already follows");
         }
-        User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        followers.getFollowers().remove(follower);
-        followers.setQuantity(followers.getQuantity() - 1);
+        following.getFollowing().add(user);
+        followingRepository.save(following);
+
+        followers.getFollowers().add(follower);
         repository.save(followers);
-
+        userRepository.save(follower);
 
     }
+
+    public Followers findFollower(UUID id) {
+        return repository.findByUserId(id);
+    }
+
+//    public void removeFollower(UUID userId, UUID followerId){
+//        Followers followers = repository.findFollowersByUserId(userId);
+//
+//        User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
+//        followers.getFollowers().remove(follower);
+//        repository.save(followers);
+//
+//        followingRepository.deleteByFollowingUserId(follower);
+//
+//    }
 }

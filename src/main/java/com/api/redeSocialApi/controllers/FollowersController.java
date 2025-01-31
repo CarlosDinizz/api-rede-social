@@ -1,5 +1,6 @@
 package com.api.redeSocialApi.controllers;
 
+import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.services.FollowerService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +21,14 @@ public class FollowersController {
         followerService.addFollower(userId, followerId);
     }
 
-    @DeleteMapping
-    public void deleteFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
-        followerService.removeFollower(userId, followerId);
+    @GetMapping("/{id}")
+    public Followers getFollowers(@PathVariable UUID id){
+        return followerService.findFollower(id);
     }
+
+//    @DeleteMapping
+//    public void deleteFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
+//        followerService.removeFollower(userId, followerId);
+//    }
 
 }

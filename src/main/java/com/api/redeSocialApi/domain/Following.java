@@ -13,17 +13,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "followers")
+@Table(name = "following")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class Followers {
+@AllArgsConstructor
+public class Following {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy =  GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
-
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,19 +32,14 @@ public class Followers {
 
     @ManyToMany
     @JoinTable(
-            name = "followers_users",
-            joinColumns = @JoinColumn(name = "followers_id"),
+            name = "following_users",
+            joinColumns = @JoinColumn(name = "following_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    List<User> followers = new ArrayList<>();
+    List<User> following = new ArrayList<>();
 
-
-    public Followers(User user, User follower){
-        this.user = user;
-        followers.add(follower);
-    }
-
-    public Followers(User user) {
-        this.user = user;
+    public Following(User following){
+        this.user = following ;
     }
 }
+

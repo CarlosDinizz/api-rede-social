@@ -42,15 +42,27 @@ public class User {
     @JsonIgnore
     private List<Post> posts;
 
-    @OneToOne(mappedBy = "userAssociated", cascade = CascadeType.ALL)
-    private Followers follower;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, targetEntity = Followers.class)
+    @JsonIgnore
+    private Followers followerEntity;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, targetEntity = Following.class)
+    private Following followingEntity;
+
+    @Column(name = "followers")
+    private Integer followers;
+
+    @Column(name = "following")
+    private Integer following;
 
     public User(UserDTO userDTO){
         this.name = userDTO.getName();
         this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
         isActivated = true;
+        followers = 0;
+        following = 0;
     }
 
 }
