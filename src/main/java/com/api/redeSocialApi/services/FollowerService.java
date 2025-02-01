@@ -49,15 +49,5 @@ public class FollowerService {
     public Followers findFollower(UUID id) {
         return repository.findByUserId(id);
     }
-
-//    public void removeFollower(UUID userId, UUID followerId){
-//        Followers followers = repository.findFollowersByUserId(userId);
-//
-//        User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
-//        followers.getFollowers().remove(follower);
-//        repository.save(followers);
-//
-//        followingRepository.deleteByFollowingUserId(follower);
-//
-//    }
+    
 }

@@ -10,5 +10,4 @@ import java.util.UUID;
 @Repository
 public interface FollowingRepository extends JpaRepository<Following, UUID> {
     Following findByUserId(UUID id);
-//    void deleteByFollowingUserId(User userFollowing);
 }

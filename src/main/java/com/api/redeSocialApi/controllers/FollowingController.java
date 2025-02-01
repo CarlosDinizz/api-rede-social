@@ -3,10 +3,7 @@ package com.api.redeSocialApi.controllers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.services.FollowingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -26,4 +23,8 @@ public class FollowingController {
         return service.findFollowing(id);
     }
 
+    @DeleteMapping
+    public void deleteFollowingByUserId(@RequestParam("userId") UUID userId, @RequestParam("followingId") UUID followingId){
+        service.deleteFollowingByUserId(userId, followingId);
+    }
 }
