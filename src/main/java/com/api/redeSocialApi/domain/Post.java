@@ -1,8 +1,7 @@
 package com.api.redeSocialApi.domain;
 
-import com.api.redeSocialApi.dtos.PostDTO;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,14 +46,7 @@ public class Post {
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Comment> comments;
 
-    public Post(PostDTO postDTO, User user){
-        urlImg = postDTO.getUrlImg();
-        description = postDTO.getDescription();
-        likes = 0;
-        time = LocalDateTime.now();
-        isCommentsBlocked = postDTO.getIsCommentsBlocked();
-        this.user = user;
-    }
 }

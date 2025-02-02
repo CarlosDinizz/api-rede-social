@@ -1,6 +1,6 @@
 package com.api.redeSocialApi.domain;
 
-import com.api.redeSocialApi.dtos.CommentDTO;
+import com.api.redeSocialApi.dtos.CommentResponseDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,11 +42,4 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Comment(CommentDTO commentDTO, User user, Post post){
-        description = commentDTO.getDescription();
-        likes = 0;
-        time = LocalDateTime.now();
-        this.post = post;
-        this.user = user;
-    }
 }

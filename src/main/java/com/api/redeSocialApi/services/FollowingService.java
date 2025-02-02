@@ -3,6 +3,7 @@ package com.api.redeSocialApi.services;
 import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.dtos.FollowingResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
 import com.api.redeSocialApi.repositories.UserRepository;
@@ -25,8 +26,9 @@ public class FollowingService {
         this.followersRepository = followersRepository;
     }
 
-    public Following findFollowing(UUID id) {
-        return repository.findByUserId(id);
+    public FollowingResponseDTO findFollowing(UUID id) {
+        Following following =  repository.findByUserId(id);
+        return toDto(following);
     }
 
     public void deleteFollowingByUserId(UUID user, UUID following){
@@ -45,4 +47,12 @@ public class FollowingService {
         followersRepository.save(theFollowerFromTheFollowing);
     }
 
+    public FollowingResponseDTO toDto(Following following){
+        return new FollowingResponseDTO(
+                following.getId(),
+                following.getUser().getId(),
+                following.getUser().getName(),
+                following.getFollowing()
+        );
+    }
 }

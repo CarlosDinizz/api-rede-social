@@ -3,6 +3,8 @@ package com.api.redeSocialApi.services;
 import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.dtos.FollowerResponseCreatedDTO;
+import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
 import com.api.redeSocialApi.repositories.UserRepository;
@@ -25,7 +27,7 @@ public class FollowerService {
         this.followingRepository = followingRepository;
     }
 
-    public void addFollower(UUID userId, UUID followerId){
+    public FollowerResponseCreatedDTO addFollower(UUID userId, UUID followerId){
         User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Followers followers = repository.findByUserId(userId);
@@ -41,13 +43,25 @@ public class FollowerService {
         followingRepository.save(following);
 
         followers.getFollowers().add(follower);
-        repository.save(followers);
-        userRepository.save(follower);
-
+        followers = repository.save(followers);
+        return toResponseCreatedDto(followers, follower);
     }
 
-    public Followers findFollower(UUID id) {
-        return repository.findByUserId(id);
+    public FollowerResponseDTO findFollower(UUID id) {
+        Followers followers = repository.findByUserId(id);
+        return toResponseDto(followers);
     }
-    
+
+    public FollowerResponseCreatedDTO toResponseCreatedDto(Followers user, User follower){
+        return new FollowerResponseCreatedDTO(user.getId(), user.getUser().getName(), follower.getName());
+    }
+
+    public FollowerResponseDTO toResponseDto(Followers followers){
+        return new FollowerResponseDTO(
+                followers.getId(),
+                followers.getUser().getId(),
+                followers.getUser().getName(),
+                followers.getFollowers()
+        );
+    }
 }

@@ -1,8 +1,10 @@
 package com.api.redeSocialApi.controllers;
 
 import com.api.redeSocialApi.domain.Following;
+import com.api.redeSocialApi.dtos.FollowingResponseDTO;
 import com.api.redeSocialApi.services.FollowingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,12 +21,14 @@ public class FollowingController {
     }
 
     @GetMapping("/{id}")
-    public Following getFollowing(@PathVariable UUID id){
-        return service.findFollowing(id);
+    public ResponseEntity<FollowingResponseDTO> getFollowing(@PathVariable UUID id){
+        FollowingResponseDTO responseDTO = service.findFollowing(id);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping
-    public void deleteFollowingByUserId(@RequestParam("userId") UUID userId, @RequestParam("followingId") UUID followingId){
+    public ResponseEntity<Void> deleteFollowingByUserId(@RequestParam("userId") UUID userId, @RequestParam("followingId") UUID followingId){
         service.deleteFollowingByUserId(userId, followingId);
+        return ResponseEntity.noContent().build();
     }
 }

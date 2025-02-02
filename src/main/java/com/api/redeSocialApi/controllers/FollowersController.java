@@ -1,7 +1,11 @@
 package com.api.redeSocialApi.controllers;
 
 import com.api.redeSocialApi.domain.Followers;
+import com.api.redeSocialApi.dtos.FollowerResponseCreatedDTO;
+import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.services.FollowerService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -17,18 +21,14 @@ public class FollowersController {
     }
 
     @PostMapping
-    public void addFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
-        followerService.addFollower(userId, followerId);
+    public ResponseEntity<FollowerResponseCreatedDTO> addFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
+        FollowerResponseCreatedDTO responseDTO = followerService.addFollower(userId, followerId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @GetMapping("/{id}")
-    public Followers getFollowers(@PathVariable UUID id){
-        return followerService.findFollower(id);
+    public ResponseEntity<FollowerResponseDTO> getFollowers(@PathVariable UUID id){
+        FollowerResponseDTO follower = followerService.findFollower(id);
+        return ResponseEntity.ok(follower);
     }
-
-//    @DeleteMapping
-//    public void deleteFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
-//        followerService.removeFollower(userId, followerId);
-//    }
-
 }
