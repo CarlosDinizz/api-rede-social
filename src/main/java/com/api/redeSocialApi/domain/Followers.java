@@ -26,25 +26,25 @@ public class Followers {
 
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "profile_id", nullable = false)
     @JsonIgnore
-    private User user;
+    private Profile profile;
 
     @ManyToMany
     @JoinTable(
-            name = "followers_users",
+            name = "followers_profile",
             joinColumns = @JoinColumn(name = "followers_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
     )
-    List<User> followers = new ArrayList<>();
+    List<Profile> followers = new ArrayList<>();
 
 
-    public Followers(User user, User follower){
-        this.user = user;
+    public Followers(Profile profile, Profile follower){
+        this.profile = profile;
         followers.add(follower);
     }
 
-    public Followers(User user) {
-        this.user = user;
+    public Followers(Profile profile) {
+        this.profile = profile;
     }
 }

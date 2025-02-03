@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record CommentResponseDTO(
         UUID id,
-        UUID user_id,
+        UUID profile_id,
         String username,
         String description,
         Integer likes,

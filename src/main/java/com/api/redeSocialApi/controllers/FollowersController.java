@@ -21,8 +21,8 @@ public class FollowersController {
     }
 
     @PostMapping
-    public ResponseEntity<FollowerResponseCreatedDTO> addFollower(@RequestParam("userId")UUID userId, @RequestParam("followerId") UUID followerId){
-        FollowerResponseCreatedDTO responseDTO = followerService.addFollower(userId, followerId);
+    public ResponseEntity<FollowerResponseCreatedDTO> addFollower(@RequestParam("profileId")UUID profileId, @RequestParam("followerId") UUID followerId){
+        FollowerResponseCreatedDTO responseDTO = followerService.addFollower(profileId, followerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 

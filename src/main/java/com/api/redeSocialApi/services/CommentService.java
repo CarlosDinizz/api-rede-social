@@ -2,12 +2,14 @@ package com.api.redeSocialApi.services;
 
 import com.api.redeSocialApi.domain.Comment;
 import com.api.redeSocialApi.domain.Post;
+import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.dtos.CommentRequestDTO;
 import com.api.redeSocialApi.dtos.CommentResponseDTO;
 import com.api.redeSocialApi.dtos.ResponseId;
 import com.api.redeSocialApi.repositories.CommentRepository;
 import com.api.redeSocialApi.repositories.PostRepository;
+import com.api.redeSocialApi.repositories.ProfileRepository;
 import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,20 +21,20 @@ import java.util.UUID;
 public class CommentService {
 
     private CommentRepository repository;
-    private UserRepository userRepository;
+    private ProfileRepository profileRepository;
     private PostRepository postRepository;
 
     @Autowired
-    public CommentService(CommentRepository repository, PostRepository postRepository, UserRepository userRepository){
+    public CommentService(CommentRepository repository, PostRepository postRepository, ProfileRepository profileRepository){
         this.repository = repository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
     }
 
     public CommentResponseDTO createComment(CommentRequestDTO requestDTO, UUID userId, UUID postId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
-        Comment comment = toComment(requestDTO, user, post);
+        Comment comment = toComment(requestDTO, profile, post);
         comment = repository.save(comment);
         return toResponseDto(comment);
     }
@@ -41,10 +43,10 @@ public class CommentService {
         repository.deleteById(id);
     }
 
-    public Comment toComment(CommentRequestDTO requestDTO, User user, Post post){
+    public Comment toComment(CommentRequestDTO requestDTO, Profile profile, Post post){
         Comment comment = new Comment();
         comment.setDescription(requestDTO.description());
-        comment.setUser(user);
+        comment.setProfile(profile);
         comment.setPost(post);
         comment.setTime(LocalDateTime.now());
         comment.setLikes(0);
@@ -54,8 +56,8 @@ public class CommentService {
 
     public CommentResponseDTO toResponseDto(Comment comment){
         return  new CommentResponseDTO(comment.getId(),
-                comment.getUser().getId(),
-                comment.getUser().getName(),
+                comment.getProfile().getId(),
+                comment.getProfile().getUsername(),
                 comment.getDescription(),
                 comment.getLikes(),
                 comment.getTime(),

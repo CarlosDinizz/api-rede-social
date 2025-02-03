@@ -2,11 +2,13 @@ package com.api.redeSocialApi.services;
 
 import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
+import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.dtos.FollowerResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
+import com.api.redeSocialApi.repositories.ProfileRepository;
 import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,29 +19,29 @@ import java.util.UUID;
 public class FollowerService {
 
     private FollowersRepository repository;
-    private UserRepository userRepository;
+    private ProfileRepository profileRepository;
     private FollowingRepository followingRepository;
 
     @Autowired
-    public FollowerService(FollowersRepository repository, UserRepository userRepository, FollowingRepository followingRepository){
+    public FollowerService(FollowersRepository repository, ProfileRepository profileRepository, FollowingRepository followingRepository){
         this.repository = repository;
-        this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
         this.followingRepository = followingRepository;
     }
 
     public FollowerResponseCreatedDTO addFollower(UUID userId, UUID followerId){
-        User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("User not found"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Followers followers = repository.findByUserId(userId);
+        Profile follower = profileRepository.findById(followerId).orElseThrow(() -> new RuntimeException("Profile not found"));
+        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new RuntimeException("Profile not found"));
+        Followers followers = repository.findByProfileId(userId);
 
 
-        Following following = followingRepository.findByUserId(followerId);
+        Following following = followingRepository.findByProfileId(followerId);
 
-        if (following.getFollowing().contains(user)){
+        if (following.getFollowing().contains(profile)){
             throw new RuntimeException("The user already follows");
         }
 
-        following.getFollowing().add(user);
+        following.getFollowing().add(profile);
         followingRepository.save(following);
 
         followers.getFollowers().add(follower);
@@ -48,19 +50,19 @@ public class FollowerService {
     }
 
     public FollowerResponseDTO findFollower(UUID id) {
-        Followers followers = repository.findByUserId(id);
+        Followers followers = repository.findByProfileId(id);
         return toResponseDto(followers);
     }
 
-    public FollowerResponseCreatedDTO toResponseCreatedDto(Followers user, User follower){
-        return new FollowerResponseCreatedDTO(user.getId(), user.getUser().getName(), follower.getName());
+    public FollowerResponseCreatedDTO toResponseCreatedDto(Followers user, Profile follower){
+        return new FollowerResponseCreatedDTO(user.getId(), user.getProfile().getUsername(), follower.getUsername());
     }
 
     public FollowerResponseDTO toResponseDto(Followers followers){
         return new FollowerResponseDTO(
                 followers.getId(),
-                followers.getUser().getId(),
-                followers.getUser().getName(),
+                followers.getProfile().getId(),
+                followers.getProfile().getUsername(),
                 followers.getFollowers()
         );
     }

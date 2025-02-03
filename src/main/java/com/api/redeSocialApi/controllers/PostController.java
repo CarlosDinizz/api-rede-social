@@ -23,9 +23,9 @@ public class PostController {
         this.service = service;
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<PostResponseCreatedDTO> newPost(@RequestBody PostRequestDTO requestDTO, @PathVariable String userId){
-        PostResponseCreatedDTO responseDTO = service.newPost(requestDTO, userId);
+    @PostMapping("/{profileId}")
+    public ResponseEntity<PostResponseCreatedDTO> newPost(@RequestBody PostRequestDTO requestDTO, @PathVariable String profileId){
+        PostResponseCreatedDTO responseDTO = service.newPost(requestDTO, profileId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
@@ -35,9 +35,9 @@ public class PostController {
         return ResponseEntity.ok(postDTO);
     }
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<List<PostResponseDTO>> postsByUserId(@PathVariable UUID userId){
-        List<PostResponseDTO> dtoList = service.postsByUserId(userId);
+    @GetMapping("/all/{profileId}")
+    public ResponseEntity<List<PostResponseDTO>> postsByUserId(@PathVariable UUID profileId){
+        List<PostResponseDTO> dtoList = service.postsByProfileId(profileId);
         return ResponseEntity.ok(dtoList);
     }
 

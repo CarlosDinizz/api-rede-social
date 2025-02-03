@@ -1,9 +1,11 @@
 package com.api.redeSocialApi.controllers;
 
-import com.api.redeSocialApi.dtos.UserDTO;
-import com.api.redeSocialApi.dtos.ResponseId;
+import com.api.redeSocialApi.dtos.UserRequestCreatedDTO;
+import com.api.redeSocialApi.dtos.UserResponseCreatedDTO;
+import com.api.redeSocialApi.dtos.UserResponseDTO;
 import com.api.redeSocialApi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +23,14 @@ public class UserController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findUser(@PathVariable UUID id){
-        UserDTO userDTO = userService.findUser(id);
-        return ResponseEntity.ok(userDTO);
+    public ResponseEntity<UserResponseDTO> findUser(@PathVariable UUID id){
+        UserResponseDTO response = userService.findUser(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<ResponseId> registerUser(@RequestBody UserDTO userDTO){
-        ResponseId id = userService.registerUser(userDTO);
-        return ResponseEntity.ok(id);
+    public ResponseEntity<UserResponseCreatedDTO> registerUser(@RequestBody UserRequestCreatedDTO request){
+        UserResponseCreatedDTO response = userService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

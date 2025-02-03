@@ -4,9 +4,9 @@ import com.api.redeSocialApi.dtos.PostRequestDTO;
 import com.api.redeSocialApi.dtos.PostResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.PostResponseDTO;
 import com.api.redeSocialApi.domain.Post;
-import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.repositories.PostRepository;
-import com.api.redeSocialApi.repositories.UserRepository;
+import com.api.redeSocialApi.repositories.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,17 +18,17 @@ import java.util.UUID;
 public class PostService {
 
     private PostRepository repository;
-    private UserRepository userRepository;
+    private ProfileRepository profileRepository;
 
     @Autowired
-    public PostService(PostRepository repository, UserRepository userRepository){
+    public PostService(PostRepository repository, ProfileRepository profileRepository){
         this.repository = repository;
-        this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
     }
 
-    public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, String idUser) {
-        User user = userRepository.findById(UUID.fromString(idUser)).orElseThrow(() -> new RuntimeException("User not found"));
-        Post post = toPost(requestDTO, user);
+    public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, String idProfile) {
+        Profile profile = profileRepository.findById(UUID.fromString(idProfile)).orElseThrow(() -> new RuntimeException("Profile not found"));
+        Post post = toPost(requestDTO, profile);
         post = repository.save(post);
         PostResponseCreatedDTO createdDTO = toPostCreatedDto(post);
         return createdDTO;
@@ -44,8 +44,8 @@ public class PostService {
         repository.deleteById(id);
     }
 
-    public List<PostResponseDTO> postsByUserId(UUID userId) {
-        List<Post> posts = repository.findPostByUserId(userId);
+    public List<PostResponseDTO> postsByProfileId(UUID profileId) {
+        List<Post> posts = repository.findPostByProfileId(profileId);
         List<PostResponseDTO> dtoList = posts.stream().map(this::toDto).toList();
         return dtoList;
     }
@@ -55,7 +55,7 @@ public class PostService {
         post.setDescription(requestDTO.description());
 
         if (requestDTO.img() != null){
-            post.setUrlImg(requestDTO.img());
+            post.setImg(requestDTO.img());
         }
 
         repository.save(post);
@@ -64,9 +64,9 @@ public class PostService {
     public PostResponseDTO toDto(Post post){
         return new PostResponseDTO(
                 post.getId(),
-                post.getUser().getId(),
-                post.getUser().getName(),
-                post.getUrlImg(),
+                post.getProfile().getId(),
+                post.getProfile().getUsername(),
+                post.getImg(),
                 post.getDescription(),
                 post.getLikes(),
                 post.getTime(),
@@ -77,23 +77,23 @@ public class PostService {
     public PostResponseCreatedDTO toPostCreatedDto(Post post){
         return new PostResponseCreatedDTO(
                 post.getId(),
-                post.getUser().getId(),
-                post.getUser().getName(),
-                post.getUrlImg(),
+                post.getProfile().getId(),
+                post.getProfile().getUsername(),
+                post.getImg(),
                 post.getDescription(),
                 post.getLikes(),
                 post.getTime()
         );
     }
 
-    public Post toPost(PostRequestDTO requestDTO, User user){
+    public Post toPost(PostRequestDTO requestDTO, Profile profile){
         Post post = new Post();
-        post.setUrlImg(requestDTO.img());
+        post.setImg(requestDTO.img());
         post.setDescription(requestDTO.description());
         post.setLikes(0);
         post.setTime(LocalDateTime.now());
         post.setIsCommentsBlocked(requestDTO.is_comments_blocked());
-        post.setUser(user);
+        post.setProfile(profile);
 
         return post;
     }

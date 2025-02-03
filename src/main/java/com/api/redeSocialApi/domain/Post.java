@@ -26,7 +26,7 @@ public class Post {
     private UUID id;
 
     @Column(name = "url_image")
-    private String urlImg;
+    private String img;
 
     @Column(name = "description")
     private String description;
@@ -40,10 +40,10 @@ public class Post {
     @Column(name = "is_comments_blocked", nullable = false)
     private Boolean isCommentsBlocked;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "profile_id")
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnore
-    private User user;
+    private Profile profile;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @JsonIgnore

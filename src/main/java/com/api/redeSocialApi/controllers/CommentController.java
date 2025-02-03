@@ -25,10 +25,10 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResponseDTO> addComment(
             @RequestParam("post") UUID postId,
-            @RequestParam("user") UUID userId,
+            @RequestParam("userProfile") UUID profileId,
             @RequestBody CommentRequestDTO requestDTO
     ){
-        CommentResponseDTO response = service.createComment(requestDTO, userId, postId);
+        CommentResponseDTO response = service.createComment(requestDTO, profileId, postId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

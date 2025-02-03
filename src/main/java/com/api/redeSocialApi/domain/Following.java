@@ -26,20 +26,20 @@ public class Following {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "profile_id", nullable = false)
     @JsonIgnore
-    private User user;
+    private Profile profile;
 
     @ManyToMany
     @JoinTable(
-            name = "following_users",
+            name = "following_profile",
             joinColumns = @JoinColumn(name = "following_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "profile_id")
     )
-    List<User> following = new ArrayList<>();
+    List<Profile> following = new ArrayList<>();
 
-    public Following(User following){
-        this.user = following ;
+    public Following(Profile following){
+        this.profile = following ;
     }
 }
 

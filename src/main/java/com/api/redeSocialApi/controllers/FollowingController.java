@@ -27,8 +27,8 @@ public class FollowingController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteFollowingByUserId(@RequestParam("userId") UUID userId, @RequestParam("followingId") UUID followingId){
-        service.deleteFollowingByUserId(userId, followingId);
+    public ResponseEntity<Void> deleteFollowingByUserId(@RequestParam("profileId") UUID profileId, @RequestParam("followingId") UUID followingId){
+        service.deleteFollowingByProfileId(profileId, followingId);
         return ResponseEntity.noContent().build();
     }
 }

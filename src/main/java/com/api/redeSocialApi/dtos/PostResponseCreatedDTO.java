@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record PostResponseCreatedDTO(
         UUID id,
-        UUID user_id,
+        UUID profile_id,
         String username,
         String img,
         String description,
