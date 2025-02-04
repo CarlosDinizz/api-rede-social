@@ -3,6 +3,7 @@ package com.api.redeSocialApi.services;
 import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.Profile;
+import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
 import com.api.redeSocialApi.dtos.FollowingResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
@@ -32,8 +33,8 @@ public class FollowingService {
     }
 
     public void deleteFollowingByProfileId(UUID profile, UUID following){
-        Profile theProfile = profileRepository.findById(profile).orElseThrow();
-        Profile theFollowing = profileRepository.findById(following).orElseThrow();
+        Profile theProfile = profileRepository.findById(profile).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+        Profile theFollowing = profileRepository.findById(following).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
 
         Following followingEntity = theProfile.getFollowingEntity();
         if (!followingEntity.getFollowing().contains(theFollowing)){

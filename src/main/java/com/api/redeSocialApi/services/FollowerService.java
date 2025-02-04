@@ -4,6 +4,8 @@ import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.domain.exceptions.FollowingExistsException;
+import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
 import com.api.redeSocialApi.dtos.FollowerResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
@@ -30,15 +32,15 @@ public class FollowerService {
     }
 
     public FollowerResponseCreatedDTO addFollower(UUID userId, UUID followerId){
-        Profile follower = profileRepository.findById(followerId).orElseThrow(() -> new RuntimeException("Profile not found"));
-        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new RuntimeException("Profile not found"));
+        Profile follower = profileRepository.findById(followerId).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
         Followers followers = repository.findByProfileId(userId);
 
 
         Following following = followingRepository.findByProfileId(followerId);
 
         if (following.getFollowing().contains(profile)){
-            throw new RuntimeException("The user already follows");
+            throw new FollowingExistsException("The user already follows");
         }
 
         following.getFollowing().add(profile);

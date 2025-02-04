@@ -2,12 +2,16 @@ package com.api.redeSocialApi.services;
 
 import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.domain.exceptions.UserEmailException;
+import com.api.redeSocialApi.domain.exceptions.UserNotFoundException;
 import com.api.redeSocialApi.dtos.UserRequestCreatedDTO;
 import com.api.redeSocialApi.dtos.UserResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.UserResponseDTO;
 import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,12 +28,17 @@ public class UserService {
     }
 
     public UserResponseDTO findUser(UUID id){
-        User user = repository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
+        User user = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Not found"));
         UserResponseDTO response = toResponseDto(user);
         return response;
     }
 
     public UserResponseCreatedDTO registerUser(UserRequestCreatedDTO request){
+
+        if (isEmailAlreadyInUse(request)){
+            throw new UserEmailException("Email already in use");
+        }
+
         User user = toUserThroughRequestCreated(request);
         user = repository.save(user);
 
@@ -60,4 +69,10 @@ public class UserService {
     public UserResponseDTO toResponseDto(User user){
         return new UserResponseDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfile().getId());
     }
+
+    private Boolean isEmailAlreadyInUse(UserRequestCreatedDTO requestCreatedDTO){
+        Optional<User> userEmailExists = repository.findByEmail(requestCreatedDTO.email());
+        return userEmailExists.isPresent();
+    }
+
 }

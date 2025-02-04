@@ -4,17 +4,19 @@ import com.api.redeSocialApi.domain.Comment;
 import com.api.redeSocialApi.domain.Post;
 import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
+import com.api.redeSocialApi.domain.exceptions.CommentNotFoundException;
+import com.api.redeSocialApi.domain.exceptions.PostNotFoundException;
+import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
 import com.api.redeSocialApi.dtos.CommentRequestDTO;
 import com.api.redeSocialApi.dtos.CommentResponseDTO;
-import com.api.redeSocialApi.dtos.ResponseId;
 import com.api.redeSocialApi.repositories.CommentRepository;
 import com.api.redeSocialApi.repositories.PostRepository;
 import com.api.redeSocialApi.repositories.ProfileRepository;
-import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,14 +34,18 @@ public class CommentService {
     }
 
     public CommentResponseDTO createComment(CommentRequestDTO requestDTO, UUID userId, UUID postId) {
-        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        Profile profile = profileRepository.findById(userId).orElseThrow(() -> new ProfileNotFoundException("User not found"));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post not found"));
         Comment comment = toComment(requestDTO, profile, post);
         comment = repository.save(comment);
         return toResponseDto(comment);
     }
 
     public void deleteCommentById(UUID id) {
+        Optional<Comment> comment = repository.findById(id);
+        if (comment.isPresent()){
+            throw new CommentNotFoundException("Comment not found");
+        }
         repository.deleteById(id);
     }
 

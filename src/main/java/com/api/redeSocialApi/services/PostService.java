@@ -1,5 +1,7 @@
 package com.api.redeSocialApi.services;
 
+import com.api.redeSocialApi.domain.exceptions.PostNotFoundException;
+import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
 import com.api.redeSocialApi.dtos.PostRequestDTO;
 import com.api.redeSocialApi.dtos.PostResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.PostResponseDTO;
@@ -27,7 +29,7 @@ public class PostService {
     }
 
     public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, String idProfile) {
-        Profile profile = profileRepository.findById(UUID.fromString(idProfile)).orElseThrow(() -> new RuntimeException("Profile not found"));
+        Profile profile = profileRepository.findById(UUID.fromString(idProfile)).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
         Post post = toPost(requestDTO, profile);
         post = repository.save(post);
         PostResponseCreatedDTO createdDTO = toPostCreatedDto(post);
@@ -35,23 +37,27 @@ public class PostService {
     }
 
     public PostResponseDTO findPost(UUID id) {
-        Post post = repository.findById(id).orElseThrow(() -> new RuntimeException("Post not Found"));
+        Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not Found"));
         PostResponseDTO responseDTO = toDto(post);
         return responseDTO;
     }
 
     public void deletePost(UUID id){
+        Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
         repository.deleteById(id);
     }
 
     public List<PostResponseDTO> postsByProfileId(UUID profileId) {
         List<Post> posts = repository.findPostByProfileId(profileId);
+        if (posts.isEmpty()){
+            throw new PostNotFoundException("Post not found");
+        }
         List<PostResponseDTO> dtoList = posts.stream().map(this::toDto).toList();
         return dtoList;
     }
 
     public void updatePost(UUID id, PostRequestDTO requestDTO) {
-        Post post = repository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
         post.setDescription(requestDTO.description());
 
         if (requestDTO.img() != null){
