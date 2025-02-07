@@ -4,7 +4,8 @@ CREATE TABLE users(
     last_name VARCHAR(256) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    is_enabled BOOLEAN NOT NULL
+    is_enabled BOOLEAN NOT NULL,
+    role VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE profile(

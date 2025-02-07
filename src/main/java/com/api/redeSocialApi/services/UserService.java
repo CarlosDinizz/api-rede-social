@@ -1,10 +1,8 @@
 package com.api.redeSocialApi.services;
 
-import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.User;
-import com.api.redeSocialApi.domain.exceptions.UserEmailException;
 import com.api.redeSocialApi.domain.exceptions.UserNotFoundException;
-import com.api.redeSocialApi.dtos.UserRequestCreatedDTO;
+import com.api.redeSocialApi.dtos.RegisterRequestDTO;
 import com.api.redeSocialApi.dtos.UserResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.UserResponseDTO;
 import com.api.redeSocialApi.repositories.UserRepository;
@@ -18,13 +16,10 @@ import java.util.UUID;
 public class UserService {
 
     private UserRepository repository;
-    private ProfileService profileService;
 
     @Autowired
-    public UserService(UserRepository repository, ProfileService profileService){
+    public UserService(UserRepository repository){
         this.repository = repository;
-        this.profileService = profileService;
-
     }
 
     public UserResponseDTO findUser(UUID id){
@@ -33,46 +28,8 @@ public class UserService {
         return response;
     }
 
-    public UserResponseCreatedDTO registerUser(UserRequestCreatedDTO request){
-
-        if (isEmailAlreadyInUse(request)){
-            throw new UserEmailException("Email already in use");
-        }
-
-        User user = toUserThroughRequestCreated(request);
-        user = repository.save(user);
-
-        profileService.registerProfile(new Profile(request.username(), user));
-        return toResponseCreatedDto(user);
-    }
-
-    public User toUserThroughRequestCreated(UserRequestCreatedDTO request){
-        User user = new User();
-        user.setFirstName(request.first_name());
-        user.setLastName(request.last_name());
-        user.setEmail(request.email());
-        user.setPassword(request.password());
-        user.setIs_enabled(true);
-        return user;
-    }
-
-
-    public UserResponseCreatedDTO toResponseCreatedDto(User user){
-        return new UserResponseCreatedDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail()
-        );
-    }
-
     public UserResponseDTO toResponseDto(User user){
         return new UserResponseDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfile().getId());
-    }
-
-    private Boolean isEmailAlreadyInUse(UserRequestCreatedDTO requestCreatedDTO){
-        Optional<User> userEmailExists = repository.findByEmail(requestCreatedDTO.email());
-        return userEmailExists.isPresent();
     }
 
 }

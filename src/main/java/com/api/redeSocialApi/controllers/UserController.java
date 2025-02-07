@@ -1,6 +1,6 @@
 package com.api.redeSocialApi.controllers;
 
-import com.api.redeSocialApi.dtos.UserRequestCreatedDTO;
+import com.api.redeSocialApi.dtos.RegisterRequestDTO;
 import com.api.redeSocialApi.dtos.UserResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.UserResponseDTO;
 import com.api.redeSocialApi.services.UserService;
@@ -28,9 +28,4 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseCreatedDTO> registerUser(@RequestBody UserRequestCreatedDTO request){
-        UserResponseCreatedDTO response = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
 }
