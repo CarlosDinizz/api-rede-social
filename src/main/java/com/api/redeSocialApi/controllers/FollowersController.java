@@ -6,6 +6,7 @@ import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.services.FollowerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,8 +22,8 @@ public class FollowersController {
     }
 
     @PostMapping
-    public ResponseEntity<FollowerResponseCreatedDTO> addFollower(@RequestParam("profileId")UUID profileId, @RequestParam("followerId") UUID followerId){
-        FollowerResponseCreatedDTO responseDTO = followerService.addFollower(profileId, followerId);
+    public ResponseEntity<FollowerResponseCreatedDTO> addFollower(@RequestParam("profileId")UUID profileId, @RequestParam("followerId") UUID followerId, JwtAuthenticationToken token){
+        FollowerResponseCreatedDTO responseDTO = followerService.addFollower(profileId, followerId, token);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 

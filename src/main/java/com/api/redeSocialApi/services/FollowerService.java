@@ -3,16 +3,16 @@ package com.api.redeSocialApi.services;
 import com.api.redeSocialApi.domain.Followers;
 import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.Profile;
-import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.domain.exceptions.FollowingExistsException;
 import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
+import com.api.redeSocialApi.domain.exceptions.UserUnauthorizedException;
 import com.api.redeSocialApi.dtos.FollowerResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.FollowerResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
 import com.api.redeSocialApi.repositories.ProfileRepository;
-import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -31,8 +31,9 @@ public class FollowerService {
         this.followingRepository = followingRepository;
     }
 
-    public FollowerResponseCreatedDTO addFollower(UUID userId, UUID followerId){
+    public FollowerResponseCreatedDTO addFollower(UUID userId, UUID followerId, JwtAuthenticationToken token){
         Profile follower = profileRepository.findById(followerId).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+        verifyToken(follower, token);
         Profile profile = profileRepository.findById(userId).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
         Followers followers = repository.findByProfileId(userId);
 
@@ -67,5 +68,11 @@ public class FollowerService {
                 followers.getProfile().getUsername(),
                 followers.getFollowers()
         );
+    }
+
+    private void verifyToken(Profile profile, JwtAuthenticationToken token){
+        if (!profile.getUser().getEmail().equals(token.getName())){
+            throw new UserUnauthorizedException();
+        }
     }
 }

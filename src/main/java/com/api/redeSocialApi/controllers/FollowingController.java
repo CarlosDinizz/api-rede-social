@@ -5,6 +5,7 @@ import com.api.redeSocialApi.dtos.FollowingResponseDTO;
 import com.api.redeSocialApi.services.FollowingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -27,8 +28,8 @@ public class FollowingController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteFollowingByUserId(@RequestParam("profileId") UUID profileId, @RequestParam("followingId") UUID followingId){
-        service.deleteFollowingByProfileId(profileId, followingId);
+    public ResponseEntity<Void> deleteFollowingByUserId(@RequestParam("profileId") UUID profileId, @RequestParam("followingId") UUID followingId, JwtAuthenticationToken token){
+        service.deleteFollowingByProfileId(profileId, followingId, token);
         return ResponseEntity.noContent().build();
     }
 }

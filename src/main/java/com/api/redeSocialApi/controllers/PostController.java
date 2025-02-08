@@ -7,6 +7,7 @@ import com.api.redeSocialApi.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +25,12 @@ public class PostController {
     }
 
     @PostMapping("/{profileId}")
-    public ResponseEntity<PostResponseCreatedDTO> newPost(@RequestBody PostRequestDTO requestDTO, @PathVariable String profileId){
-        PostResponseCreatedDTO responseDTO = service.newPost(requestDTO, profileId);
+    public ResponseEntity<PostResponseCreatedDTO> newPost(
+            @RequestBody PostRequestDTO requestDTO,
+            @PathVariable UUID profileId,
+            JwtAuthenticationToken token
+    ){
+        PostResponseCreatedDTO responseDTO = service.newPost(requestDTO, profileId, token);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
@@ -35,21 +40,25 @@ public class PostController {
         return ResponseEntity.ok(postDTO);
     }
 
-    @GetMapping("/all/{profileId}")
-    public ResponseEntity<List<PostResponseDTO>> postsByUserId(@PathVariable UUID profileId){
+    @GetMapping
+    public ResponseEntity<List<PostResponseDTO>> postsByUserId(@RequestParam(name = "profileId") UUID profileId){
         List<PostResponseDTO> dtoList = service.postsByProfileId(profileId);
         return ResponseEntity.ok(dtoList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id){
-        service.deletePost(id);
+    public ResponseEntity<Void> deletePost(@PathVariable UUID id, JwtAuthenticationToken token){
+        service.deletePost(id, token);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@PathVariable UUID id,@RequestBody PostRequestDTO requestDTO){
-        service.updatePost(id, requestDTO);
+    public ResponseEntity<Void> updatePost(
+            @PathVariable UUID id,
+            @RequestBody PostRequestDTO requestDTO,
+            JwtAuthenticationToken token
+    ){
+        service.updatePost(id, requestDTO, token);
         return ResponseEntity.noContent().build();
     }
 }

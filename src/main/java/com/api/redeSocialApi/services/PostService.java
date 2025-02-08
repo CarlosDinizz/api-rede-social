@@ -2,6 +2,7 @@ package com.api.redeSocialApi.services;
 
 import com.api.redeSocialApi.domain.exceptions.PostNotFoundException;
 import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
+import com.api.redeSocialApi.domain.exceptions.UserUnauthorizedException;
 import com.api.redeSocialApi.dtos.PostRequestDTO;
 import com.api.redeSocialApi.dtos.PostResponseCreatedDTO;
 import com.api.redeSocialApi.dtos.PostResponseDTO;
@@ -10,6 +11,7 @@ import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.repositories.PostRepository;
 import com.api.redeSocialApi.repositories.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,8 +30,11 @@ public class PostService {
         this.profileRepository = profileRepository;
     }
 
-    public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, String idProfile) {
-        Profile profile = profileRepository.findById(UUID.fromString(idProfile)).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+    public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, UUID idProfile, JwtAuthenticationToken token) {
+        Profile profile = profileRepository.findById(idProfile).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+
+        validateToken(token, profile);
+
         Post post = toPost(requestDTO, profile);
         post = repository.save(post);
         PostResponseCreatedDTO createdDTO = toPostCreatedDto(post);
@@ -42,8 +47,9 @@ public class PostService {
         return responseDTO;
     }
 
-    public void deletePost(UUID id){
+    public void deletePost(UUID id, JwtAuthenticationToken token){
         Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
+        validateToken(token, post.getProfile());
         repository.deleteById(id);
     }
 
@@ -56,8 +62,9 @@ public class PostService {
         return dtoList;
     }
 
-    public void updatePost(UUID id, PostRequestDTO requestDTO) {
+    public void updatePost(UUID id, PostRequestDTO requestDTO, JwtAuthenticationToken token) {
         Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
+        validateToken(token, post.getProfile());
         post.setDescription(requestDTO.description());
 
         if (requestDTO.img() != null){
@@ -102,5 +109,11 @@ public class PostService {
         post.setProfile(profile);
 
         return post;
+    }
+
+    private void validateToken(JwtAuthenticationToken token, Profile profile){
+        if (!profile.getUser().getEmail().equals(token.getName())){
+            throw new UserUnauthorizedException();
+        }
     }
 }

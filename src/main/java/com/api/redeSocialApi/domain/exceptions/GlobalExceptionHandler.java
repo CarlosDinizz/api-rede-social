@@ -49,4 +49,10 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = new ExceptionResponse(HttpStatus.NOT_FOUND, exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+
+    @ExceptionHandler(UserUnauthorizedException.class)
+    public ResponseEntity<ExceptionResponse> userUnauthorizedException(UserUnauthorizedException exception){
+        ExceptionResponse response = new ExceptionResponse(HttpStatus.FORBIDDEN, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
 }

@@ -5,12 +5,15 @@ import com.api.redeSocialApi.domain.Following;
 import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.exceptions.ProfileNotFoundException;
 import com.api.redeSocialApi.domain.exceptions.ProfileUsernameException;
+import com.api.redeSocialApi.domain.exceptions.UserUnauthorizedException;
 import com.api.redeSocialApi.dtos.ProfileRequestDTO;
 import com.api.redeSocialApi.dtos.ProfileResponseDTO;
 import com.api.redeSocialApi.repositories.FollowersRepository;
 import com.api.redeSocialApi.repositories.FollowingRepository;
 import com.api.redeSocialApi.repositories.ProfileRepository;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -42,7 +45,7 @@ public class ProfileService {
         return toDto(profile);
     }
 
-    public void updateProfile(UUID id, ProfileRequestDTO requestDTO){
+    public void updateProfile(UUID id, ProfileRequestDTO requestDTO, JwtAuthenticationToken token){
         Optional<Profile> usernameExists = repository.findByUsername(requestDTO.username());
 
         if (usernameExists.isPresent()){
@@ -50,6 +53,11 @@ public class ProfileService {
         }
 
         Profile profile = repository.findById(id).orElseThrow(() -> new ProfileNotFoundException(("Profile not found")));
+
+        if (!profile.getUser().getEmail().equals(token.getName())){
+            throw new UserUnauthorizedException();
+        }
+
         profile.setUsername(requestDTO.username());
 
         if (requestDTO.bio() != null){
