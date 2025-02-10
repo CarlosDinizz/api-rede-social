@@ -32,6 +32,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(UserPasswordException.class)
+    public ResponseEntity<ExceptionResponse> userPasswordExceptionHandler(UserPasswordException exception) {
+        ExceptionResponse response = new ExceptionResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ExceptionResponse> commentNotFoundExceptionHandler(CommentNotFoundException exception){
         ExceptionResponse response = new ExceptionResponse(HttpStatus.NOT_FOUND, exception.getMessage());

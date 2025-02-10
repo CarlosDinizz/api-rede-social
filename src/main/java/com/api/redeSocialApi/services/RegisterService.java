@@ -4,23 +4,24 @@ import com.api.redeSocialApi.domain.Profile;
 import com.api.redeSocialApi.domain.Role;
 import com.api.redeSocialApi.domain.User;
 import com.api.redeSocialApi.domain.exceptions.UserEmailException;
+import com.api.redeSocialApi.domain.exceptions.UserPasswordException;
 import com.api.redeSocialApi.dtos.RegisterLoginRequestDTO;
 import com.api.redeSocialApi.dtos.RegisterLoginResponseDTO;
 import com.api.redeSocialApi.dtos.RegisterRequestDTO;
-import com.api.redeSocialApi.dtos.UserResponseCreatedDTO;
 import com.api.redeSocialApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import java.util.regex.Matcher;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +41,13 @@ public class RegisterService {
     }
 
     public void registerUser(RegisterRequestDTO request){
+        if (!isValidEmail(request.email())){
+            throw new UserEmailException("Invalid email");
+        }
+
+        if (request.password().length() < 8){
+            throw new UserPasswordException("Invalid password");
+        }
 
         if (userExists(request.email())){
             throw new UserEmailException("Email already in use");
@@ -101,5 +109,12 @@ public class RegisterService {
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    private Boolean isValidEmail(String email){
+        Pattern pattern = Pattern.compile("^[a-zA-Z\\d]+[\\w\\d]*((\\.|\\-|\\_|\\+)(?=\\d[a-zA-Z]*)*[\\w\\d]+)*\\@{1}[a-zA-Z\\d]+((\\.|\\-)(?=[a-zA-Z\\d]*)+[a-zA-Z\\d]{2,})+$");
+        Matcher matcher = pattern.matcher(email);
+
+        return matcher.find();
     }
 }

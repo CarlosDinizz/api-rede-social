@@ -31,5 +31,4 @@ public class UserService {
     public UserResponseDTO toResponseDto(User user){
         return new UserResponseDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getProfile().getId());
     }
-
 }
