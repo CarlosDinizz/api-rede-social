@@ -38,7 +38,7 @@ public class FollowerService {
         Followers followers = repository.findByProfileId(userId);
 
 
-        Following following = followingRepository.findByProfileId(followerId);
+        Following following = followingRepository.findByProfileId(followerId).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
 
         if (following.getFollowing().contains(profile)){
             throw new FollowingExistsException("The user already follows");

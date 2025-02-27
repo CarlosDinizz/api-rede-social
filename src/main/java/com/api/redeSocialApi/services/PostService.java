@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,37 +24,68 @@ public class PostService {
 
     private PostRepository repository;
     private ProfileRepository profileRepository;
+    private JwtService jwtService;
 
     @Autowired
-    public PostService(PostRepository repository, ProfileRepository profileRepository){
+    public PostService(PostRepository repository, ProfileRepository profileRepository, JwtService jwtService){
         this.repository = repository;
         this.profileRepository = profileRepository;
+        this.jwtService = jwtService;
     }
 
     public PostResponseCreatedDTO newPost(PostRequestDTO requestDTO, UUID idProfile, JwtAuthenticationToken token) {
-        Profile profile = profileRepository.findById(idProfile).orElseThrow(() -> new ProfileNotFoundException("Profile not found"));
+        boolean profileExists = profileRepository.existsById(idProfile);
 
-        validateToken(token, profile);
+        if (!profileExists){
+            throw new ProfileNotFoundException("Profile not found");
+        }
 
-        Post post = toPost(requestDTO, profile);
+        Optional<Profile> profile = profileRepository.findById(idProfile);
+
+        Post post;
+        Boolean isValid = jwtService.validateToken(profile.get().getUser(), token);
+
+        if (!isValid){
+            throw new UserUnauthorizedException();
+        }
+
+        post = toPost(requestDTO, profile.get());
         post = repository.save(post);
         PostResponseCreatedDTO createdDTO = toPostCreatedDto(post);
         return createdDTO;
     }
 
     public PostResponseDTO findPost(UUID id) {
-        Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not Found"));
-        PostResponseDTO responseDTO = toDto(post);
+
+        boolean exists = repository.existsById(id);
+
+        if (!exists){
+            throw new PostNotFoundException("Post not found");
+        }
+
+        Optional<Post> post = repository.findById(id);
+        PostResponseDTO responseDTO = toDto(post.get());
         return responseDTO;
     }
 
     public void deletePost(UUID id, JwtAuthenticationToken token){
         Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
-        validateToken(token, post.getProfile());
+        Boolean isValid = jwtService.validateToken(post.getProfile().getUser(), token);
+
+        if (!isValid){
+            throw new UserUnauthorizedException();
+        }
+
         repository.deleteById(id);
     }
 
     public List<PostResponseDTO> postsByProfileId(UUID profileId) {
+        boolean profileExists = profileRepository.existsById(profileId);
+
+        if (!profileExists){
+            throw new ProfileNotFoundException("Profile not found");
+        }
+
         List<Post> posts = repository.findPostByProfileId(profileId);
         if (posts.isEmpty()){
             throw new PostNotFoundException("Post not found");
@@ -64,14 +96,22 @@ public class PostService {
 
     public void updatePost(UUID id, PostRequestDTO requestDTO, JwtAuthenticationToken token) {
         Post post = repository.findById(id).orElseThrow(() -> new PostNotFoundException("Post not found"));
-        validateToken(token, post.getProfile());
-        post.setDescription(requestDTO.description());
+        Boolean isValid = jwtService.validateToken(post.getProfile().getUser(), token);
+
+        if (!isValid){
+            throw new UserUnauthorizedException();
+        }
+
+
+        if (requestDTO.description() != null){
+            post.setDescription(requestDTO.description());
+        }
 
         if (requestDTO.img() != null){
             post.setImg(requestDTO.img());
         }
-
         repository.save(post);
+
     }
 
     public PostResponseDTO toDto(Post post){
@@ -111,9 +151,4 @@ public class PostService {
         return post;
     }
 
-    private void validateToken(JwtAuthenticationToken token, Profile profile){
-        if (!profile.getUser().getEmail().equals(token.getName())){
-            throw new UserUnauthorizedException();
-        }
-    }
 }

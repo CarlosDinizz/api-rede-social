@@ -2,6 +2,7 @@ package com.api.redeSocialApi.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Profile {
 
     @Id
@@ -47,5 +49,6 @@ public class Profile {
     public Profile(String username, User user) {
         this.username = username;
         this.user = user;
+        bio = "";
     }
 }
